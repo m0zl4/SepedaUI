@@ -43,12 +43,14 @@ struct ContentView: View {
         ProductModel(id: 10, namaProduk: "Pacific", fotoProduk: "foto10", hargaProduk: 5500000, lokasi: "Kab. Sumedang", ratingCount: 4, jumlahRating: 56)
     ]
     
+    @State var jumlahKeranjang: Int = 0
+    
     var body: some View {
         NavigationView{
             ScrollView{
                 ForEach(data){ row in
                     VStack(spacing: 10){
-                        Product(data: row)
+                        Product(data: row, jumlahProduk: self.$jumlahKeranjang)
                     }
                     .padding()
                     
@@ -57,7 +59,7 @@ struct ContentView: View {
             .navigationBarTitle("Sepeda MTB")
             .navigationBarItems(
             trailing:
-                HStack(spacing: 20){
+                HStack(spacing: 10){
                     
                     Button(action: {print()}){
                         Image(systemName: "envelope.fill")
@@ -67,9 +69,7 @@ struct ContentView: View {
                         Image(systemName: "bell.fill")
                     }
                     
-                    Button(action: {print()}){
-                        Image(systemName: "cart.fill")
-                    }
+                    keranjangView(jumlah: $jumlahKeranjang)
                     
                     Button(action: {print()}){
                         Image(systemName: "person.fill")
@@ -85,6 +85,30 @@ struct ContentView: View {
     }
 }
 
+struct keranjangView: View{
+    
+    @Binding var jumlah: Int
+    
+    var body: some View{
+        ZStack{
+            Button(action: {print()}){
+                Image(systemName: "cart.fill")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+            }
+            
+            Text("\(jumlah)")
+                .foregroundColor(Color.white)
+                .frame(width: 10, height: 10)
+                .font(.body)
+                .padding(5)
+                .background(Color.red)
+                .clipShape(Circle())
+                .offset(x: 10, y: -10)
+        }
+    }
+}
+
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
@@ -95,6 +119,7 @@ struct Product: View {
     
     let data: ProductModel
     
+    @Binding var jumlahProduk: Int
     
     var body: some View{
         VStack(alignment: .leading){
@@ -147,24 +172,33 @@ struct Product: View {
             .padding(.trailing)
             .padding(.top,5)
             
-            Button(action: {print("ditambahkan")}){
-                HStack{
-                    Spacer()
-                    HStack{
-                        Image(systemName: "cart")
-                        Text("Tambah ke keranjnag")
-                            .font(.callout)
-                            .padding()
-                    }
-                    Spacer()
-                }
-            }
-            .background(Color.green)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-            .padding()
+            tambahKeranjang(jumlah: $jumlahProduk)
         }
         .background(Color("warna"))
         .cornerRadius(15)
+    }
+}
+
+struct tambahKeranjang: View {
+    
+    @Binding var jumlah: Int
+    
+    var body: some View{
+        Button(action: {self.jumlah += 1}){
+            HStack{
+                Spacer()
+                HStack{
+                    Image(systemName: "cart")
+                    Text("Tambah ke keranjang")
+                        .font(.callout)
+                        .padding()
+                }
+                Spacer()
+            }
+        }
+        .background(Color.green)
+        .foregroundColor(.white)
+        .cornerRadius(10)
+        .padding()
     }
 }
